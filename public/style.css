@@ -1,0 +1,334 @@
+:root {
+    --bg-color: #0b0f19;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-main: #f0f4f8;
+    --text-muted: #94a3b8;
+    
+    /* Player Colors */
+    --color-p0: #ef4444; /* Red */
+    --color-p1: #3b82f6; /* Blue */
+    --color-p2: #22c55e; /* Green */
+    --color-p3: #eab308; /* Yellow */
+
+    /* Status Colors */
+    --color-success: #10b981;
+    --color-error: #f43f5e;
+    --color-unknown: rgba(255,255,255,0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Animated Flowing Background Shapes */
+.bg-shape {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: -1;
+    opacity: 0.5;
+    animation: float 20s infinite ease-in-out alternate;
+}
+
+.shape1 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #4f46e5 0%, transparent 70%);
+    top: -200px;
+    left: -200px;
+}
+
+.shape2 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #db2777 0%, transparent 70%);
+    bottom: -100px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+.shape3 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, #0ea5e9 0%, transparent 70%);
+    top: 50%;
+    left: 40%;
+    animation-delay: -10s;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(50px, 50px) scale(1.1); }
+}
+
+/* Liquid Glass Panels */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 600px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel.hidden {
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.glass-panel.active {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Typography elements */
+h1 {
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    line-height: 1.2;
+    text-align: center;
+}
+h1 span {
+    background: -webkit-linear-gradient(45deg, #f472b6, #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Inputs & Buttons */
+.input-group {
+    margin-bottom: 25px;
+}
+.input-group label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+input {
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+}
+input:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+/* Player Selection */
+.player-select {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+.player-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+.player-btn.selected {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+.player-btn.p0.selected { background: var(--color-p0); border-color: var(--color-p0); }
+.player-btn.p1.selected { background: var(--color-p1); border-color: var(--color-p1); }
+.player-btn.p2.selected { background: var(--color-p2); border-color: var(--color-p2); }
+.player-btn.p3.selected { background: var(--color-p3); border-color: var(--color-p3); }
+
+.primary-btn {
+    background: linear-gradient(45deg, #4f46e5, #0ea5e9);
+    border: none;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
+}
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.6);
+}
+.secondary-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.secondary-btn:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+}
+.danger-btn {
+    background: rgba(244, 63, 94, 0.2);
+    border: 1px solid rgba(244, 63, 94, 0.5);
+    color: #fca5a5;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+.danger-btn:hover { background: rgba(244, 63, 94, 0.4); }
+
+/* Main App Layout */
+#app-screen {
+    max-width: 800px;
+    padding: 20px;
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--glass-border);
+}
+.room-info h2 { font-size: 1.2rem; }
+.my-identity { font-size: 0.9rem; color: var(--text-muted); margin-top: 5px; }
+
+/* Floors Container */
+#floors-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: 75vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+#floors-container::-webkit-scrollbar { width: 8px; }
+#floors-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
+#floors-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+/* Floor Card */
+.floor-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.floor-header {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #94a3b8;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+.floor-header span {
+    background: #38bdf8;
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin-left: 10px;
+}
+
+/* Matrix Row */
+.matrix-row {
+    display: grid;
+    grid-template-columns: 80px repeat(4, 1fr);
+    gap: 10px;
+    align-items: center;
+}
+.player-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 8px 0;
+    border-radius: 8px;
+    color: white;
+}
+.l-p0 { background: rgba(239, 68, 68, 0.4); border: 1px solid rgb(239, 68, 68); }
+.l-p1 { background: rgba(59, 130, 246, 0.4); border: 1px solid rgb(59, 130, 246); }
+.l-p2 { background: rgba(34, 197, 94, 0.4); border: 1px solid rgb(34, 197, 94); }
+.l-p3 { background: rgba(234, 179, 8, 0.4); border: 1px solid rgb(234, 179, 8); }
+
+/* Platform Button (The Cell) */
+.plat-btn {
+    background: var(--color-unknown);
+    border: 1px solid var(--glass-border);
+    padding: 15px 0;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+.plat-btn:hover {
+    background: rgba(255,255,255,0.15);
+    transform: scale(1.05);
+}
+.plat-btn.state-wrong {
+    background: rgba(244, 63, 94, 0.2);
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+.plat-btn.state-correct {
+    background: rgba(16, 185, 129, 0.3);
+    border-color: var(--color-success);
+    color: var(--color-success);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    pointer-events: none; /* Logic solves it, no more clicking */
+}
+/* Focus effect for current player rows */
+.matrix-row.my-row .plat-btn {
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+@media (max-width: 600px) {
+    .matrix-row {
+        grid-template-columns: 60px repeat(4, 1fr);
+        gap: 5px;
+    }
+    .plat-btn { padding: 10px 0; font-size: 0.9rem; }
+    h1 { font-size: 2rem; }
+}
