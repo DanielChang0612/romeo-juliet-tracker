@@ -86,8 +86,16 @@ body {
     padding: 30px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     width: 100%;
-    max-width: 600px;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#login-screen {
+    max-width: 600px;
+}
+
+.glass-panel.wide-panel {
+    max-width: 900px;
+    width: 100%;
 }
 
 .glass-panel.hidden {
@@ -187,6 +195,7 @@ input:focus {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(14, 165, 233, 0.6);
 }
+
 .secondary-btn {
     background: rgba(255,255,255,0.1);
     border: 1px solid var(--glass-border);
@@ -202,6 +211,7 @@ input:focus {
     background: rgba(255,255,255,0.2);
     transform: translateY(-2px);
 }
+
 .danger-btn {
     background: rgba(244, 63, 94, 0.2);
     border: 1px solid rgba(244, 63, 94, 0.5);
@@ -214,11 +224,8 @@ input:focus {
 }
 .danger-btn:hover { background: rgba(244, 63, 94, 0.4); }
 
-/* Main App Layout */
-#app-screen {
-    max-width: 800px;
-    padding: 20px;
-}
+
+/* Main App Header */
 header {
     display: flex;
     justify-content: space-between;
@@ -228,85 +235,119 @@ header {
     border-bottom: 1px solid var(--glass-border);
 }
 .room-info h2 { font-size: 1.2rem; }
-.my-identity { font-size: 0.9rem; color: var(--text-muted); margin-top: 5px; }
+.my-identity { font-size: 0.9rem; color: var(--text-muted); margin-top: 5px; font-weight: 600; }
 
-/* Floors Container */
-#floors-container {
+/* Split Layout */
+.app-layout {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    max-height: 75vh;
-    overflow-y: auto;
-    padding-right: 10px;
+    gap: 30px;
 }
-#floors-container::-webkit-scrollbar { width: 8px; }
-#floors-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
-#floors-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
 
-/* Floor Card */
-.floor-card {
+@media (min-width: 768px) {
+    .app-layout {
+        flex-direction: row;
+    }
+    .action-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+    .cheatsheet-section {
+        flex: 1;
+        height: 60vh;
+    }
+}
+
+/* Action Card */
+.action-card {
     background: rgba(255,255,255,0.02);
     border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.floor-header {
-    font-weight: 800;
-    font-size: 1.2rem;
-    color: #94a3b8;
-    margin-bottom: 5px;
-    display: flex;
-    align-items: center;
-}
-.floor-header span {
-    background: #38bdf8;
-    color: #000;
-    padding: 2px 8px;
     border-radius: 20px;
-    font-size: 0.8rem;
-    margin-left: 10px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* Matrix Row */
-.matrix-row {
-    display: grid;
-    grid-template-columns: 80px repeat(4, 1fr);
-    gap: 10px;
+.floor-nav {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    margin-bottom: 25px;
 }
-.player-label {
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-align: center;
-    padding: 8px 0;
-    border-radius: 8px;
+.icon-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
     color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
 }
-.l-p0 { background: rgba(239, 68, 68, 0.4); border: 1px solid rgb(239, 68, 68); }
-.l-p1 { background: rgba(59, 130, 246, 0.4); border: 1px solid rgb(59, 130, 246); }
-.l-p2 { background: rgba(34, 197, 94, 0.4); border: 1px solid rgb(34, 197, 94); }
-.l-p3 { background: rgba(234, 179, 8, 0.4); border: 1px solid rgb(234, 179, 8); }
+.icon-btn:hover:not(:disabled) {
+    background: rgba(255,255,255,0.2);
+}
+.icon-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+#current-floor-label {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #38bdf8;
+    text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+}
 
-/* Platform Button (The Cell) */
+/* Floor Action aesthetics */
+.action-buttons-wrapper {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 35px 15px 40px 15px;
+    border-radius: 20px;
+    position: relative;
+    box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.floor-plate {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.5), transparent);
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 -5px 20px rgba(56, 189, 248, 0.3);
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
 .plat-btn {
     background: var(--color-unknown);
-    border: 1px solid var(--glass-border);
-    padding: 15px 0;
-    border-radius: 12px;
+    border: 2px solid var(--glass-border);
+    padding: 25px 0;
+    border-radius: 16px;
     color: white;
-    font-weight: 600;
+    font-size: 1.5rem;
+    font-weight: 800;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
 }
 .plat-btn:hover {
     background: rgba(255,255,255,0.15);
     transform: scale(1.05);
 }
+
+/* Base borders by player color to remind them who they are */
+.border-p0 { border-color: rgba(239, 68, 68, 0.5); }
+.border-p1 { border-color: rgba(59, 130, 246, 0.5); }
+.border-p2 { border-color: rgba(34, 197, 94, 0.5); }
+.border-p3 { border-color: rgba(234, 179, 8, 0.5); }
+
+/* States */
 .plat-btn.state-wrong {
     background: rgba(244, 63, 94, 0.2);
     border-color: var(--color-error);
@@ -317,18 +358,78 @@ header {
     border-color: var(--color-success);
     color: var(--color-success);
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
-    pointer-events: none; /* Logic solves it, no more clicking */
-}
-/* Focus effect for current player rows */
-.matrix-row.my-row .plat-btn {
-    border: 1px solid rgba(255,255,255,0.3);
 }
 
+/* Cheat Sheet Table */
+.cheatsheet-section {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.cheatsheet-title {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #f8fafc;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.table-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+.table-container::-webkit-scrollbar { width: 6px; }
+.table-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
+.table-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+.cheato-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    text-align: center;
+}
+.cheato-table th, .cheato-table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.cheato-table th {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    position: sticky;
+    top: 0;
+    background: #111827; /* Dark background so scrolling under doesn't look messy */
+    z-index: 1;
+}
+
+.cheato-table td {
+    font-size: 1.1rem;
+    font-weight: 800;
+    transition: background 0.3s;
+}
+
+/* Highlight my column */
+.my-col {
+    background: rgba(255,255,255,0.08);
+}
+.my-col-th {
+    color: #f8fafc !important;
+}
+
+/* Data states in table */
+.td-correct { color: var(--color-success); text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+.td-unknown { color: var(--text-muted); font-weight: 400; }
+
 @media (max-width: 600px) {
-    .matrix-row {
-        grid-template-columns: 60px repeat(4, 1fr);
-        gap: 5px;
-    }
-    .plat-btn { padding: 10px 0; font-size: 0.9rem; }
-    h1 { font-size: 2rem; }
+    body { padding: 0; }
+    .glass-panel { border-radius: 0; border: none; min-height: 100vh; padding: 20px 10px; }
+    .action-card { border: none; background: transparent; padding: 10px; box-shadow: none; }
+    .cheatsheet-section { border-radius: 20px 20px 0 0; border-width: 1px 0 0 0; }
+    
+    .plat-btn { padding: 15px 0; font-size: 1.2rem; border-width: 1px; }
+    h1 { font-size: 2rem; margin-top: 20px; }
+    .cheatsheet-section { max-height: 50vh; }
 }

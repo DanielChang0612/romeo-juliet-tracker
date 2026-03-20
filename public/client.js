@@ -9,12 +9,22 @@ const joinBtn = document.getElementById('join-btn');
 const displayRoom = document.getElementById('display-room');
 const displayIdentity = document.getElementById('display-identity');
 const resetBtn = document.getElementById('reset-btn');
-const floorsContainer = document.getElementById('floors-container');
+
+// Action Card elements
+const currentFloorLabel = document.getElementById('current-floor-label');
+const prevFloorBtn = document.getElementById('prev-floor-btn');
+const nextFloorBtn = document.getElementById('next-floor-btn');
+const actionBtns = document.querySelectorAll('.my-plat-btn');
+
+// Cheatsheet Elements
+const cheatsheetBody = document.getElementById('cheatsheet-body');
 
 // State
 let myRoomId = '';
 let myPlayerId = -1; 
 let playerNames = ['玩家 A', '玩家 B', '玩家 C', '玩家 D'];
+let globalMatrix = []; // stores matrix passed from server
+let currentFocusFloor = 0; // 0 to 9
 
 // Login logic
 playerBtns.forEach(btn => {
@@ -45,7 +55,7 @@ joinBtn.addEventListener('click', () => {
     myRoomId = roomId;
     displayRoom.innerText = myRoomId;
     
-    // Optimistic update of own identity name, actual sync will update the rest
+    // Optimistic update of own identity name
     if (customName) playerNames[myPlayerId] = customName;
     displayIdentity.innerText = `我是角色: ${playerNames[myPlayerId]}`;
     displayIdentity.style.color = `var(--color-p${myPlayerId})`;
@@ -55,100 +65,195 @@ joinBtn.addEventListener('click', () => {
         loginScreen.classList.add('hidden');
         appScreen.classList.remove('hidden');
         appScreen.classList.add('active');
+        
+        initCheatsheetUI();
+
         socket.emit('joinRoom', { 
             roomId: myRoomId, 
             playerId: myPlayerId, 
             playerName: customName 
         });
-    }, 400); // Wait for fade out
+    }, 400);
 });
 
 resetBtn.addEventListener('click', () => {
-    if (confirm('確定要重置所有樓層的紀錄嗎？')) {
+    if (confirm('確定要重置整個房間的紀錄嗎？')) {
         socket.emit('resetRoom', myRoomId);
+        currentFocusFloor = 0;
     }
 });
 
-// Initialize UI Matrix
-function createMatrixUI() {
-    floorsContainer.innerHTML = '';
-    // Floors 9 down to 0 (visually 10 to 1)
-    for (let f = 9; f >= 0; f--) {
-        const floorCard = document.createElement('div');
-        floorCard.className = 'floor-card';
-        floorCard.innerHTML = `
-            <div class="floor-header">
-                <div>第 ${f + 1} 層 <span>Floor ${f + 1}</span></div>
-            </div>
-        `;
+// Navigation Logic
+prevFloorBtn.addEventListener('click', () => {
+    if (currentFocusFloor > 0) {
+        currentFocusFloor--;
+        updateFocusFloorUI();
+    }
+});
+
+nextFloorBtn.addEventListener('click', () => {
+    if (currentFocusFloor < 9) {
+        currentFocusFloor++;
+        updateFocusFloorUI();
+    }
+});
+
+// Action Card Buttons Event Listener
+actionBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        if (!globalMatrix || globalMatrix.length === 0) return;
         
-        for (let p = 0; p < 4; p++) {
-            const row = document.createElement('div');
-            row.className = `matrix-row ${myPlayerId === p ? 'my-row' : ''}`;
-            
-            const label = document.createElement('div');
-            label.className = `player-label l-p${p}`;
-            label.innerText = playerNames[p];
-            row.appendChild(label);
+        const platform = parseInt(e.target.getAttribute('data-plat'));
 
-            for (let pl = 0; pl < 4; pl++) {
-                const btn = document.createElement('button');
-                btn.className = 'plat-btn';
-                btn.id = `btn-${f}-${p}-${pl}`;
-                btn.innerText = pl + 1; // 1, 2, 3, 4
-                
-                // Interaction
-                btn.addEventListener('click', () => {
-                    handlePlatformClick(f, p, pl);
-                });
-
-                row.appendChild(btn);
-            }
-            floorCard.appendChild(row);
+        let newValue = 1; // Default to Complete (✅)
+        if (e.target.classList.contains('state-correct')) {
+            newValue = -1; // Toggle to Wrong (❌)
+        } else if (e.target.classList.contains('state-wrong')) {
+            newValue = 0; // Toggle to Unknown
         }
-        floorsContainer.appendChild(floorCard);
+
+        // UX: Radio behavior if setting to correct
+        if (newValue === 1) {
+            for (let i = 0; i < 4; i++) {
+                if (i !== platform && globalMatrix[currentFocusFloor][myPlayerId][i] === 1) {
+                    // Send an undo for the old one immediately
+                    socket.emit('updateState', {
+                        roomId: myRoomId,
+                        floor: currentFocusFloor,
+                        player: myPlayerId,
+                        platform: i,
+                        value: 0
+                    });
+                }
+            }
+        }
+
+        // Before sending update, predict auto-scroll
+        const wasPreviouslyCorrect = e.target.classList.contains('state-correct');
+        const willBeCorrect = newValue === 1;
+
+        socket.emit('updateState', {
+            roomId: myRoomId,
+            floor: currentFocusFloor,
+            player: myPlayerId,
+            platform,
+            value: newValue
+        });
+
+        // Advanced UX auto-scroll if setting to correct and we are not on top floor
+        if (!wasPreviouslyCorrect && willBeCorrect && currentFocusFloor < 9) {
+            setTimeout(() => {
+                currentFocusFloor++;
+                updateFocusFloorUI();
+            }, 500); // 0.5s delay to let users see the effect
+        }
+    });
+
+    // Setup border colors based on player choice during init
+    btn.classList.add(`border-p${myPlayerId}`);
+});
+
+// Construct empty cheat sheet
+function initCheatsheetUI() {
+    cheatsheetBody.innerHTML = '';
+    for (let f = 0; f < 10; f++) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td style="color:var(--text-muted); font-size:0.9rem;">第 ${f + 1} 層</td>
+            <td id="cs-${f}-0" class="cs-cell">-</td>
+            <td id="cs-${f}-1" class="cs-cell">-</td>
+            <td id="cs-${f}-2" class="cs-cell">-</td>
+            <td id="cs-${f}-3" class="cs-cell">-</td>`;
+        cheatsheetBody.appendChild(tr);
     }
 }
 
-function handlePlatformClick(floor, player, platform) {
-    if (player !== myPlayerId) {
-        // Can't click other players' rows
-        return;
+// Ensure the th/td representing the current user is subtly highlighted in the table
+function updateTableHighlights() {
+    for (let p = 0; p < 4; p++) {
+        const th = document.querySelector(`.th-p${p}`);
+        if(th) {
+            th.classList.toggle('my-col-th', p === myPlayerId);
+        }
+        for (let f = 0; f < 10; f++) {
+            const td = document.getElementById(`cs-${f}-${p}`);
+            if (td) {
+                td.classList.toggle('my-col', p === myPlayerId);
+            }
+        }
     }
+}
 
-    // Current state check from DOM classes
-    const btn = document.getElementById(`btn-${floor}-${player}-${platform}`);
-    if (btn.classList.contains('state-correct')) return; // Already solved
-
-    let newValue = -1; // Default to marking wrong on click
-    if (btn.classList.contains('state-wrong')) {
-        newValue = 0; // Toggle back to unknown (undo)
+function updateLabels() {
+    for (let p = 0; p < 4; p++) {
+        const th = document.querySelector(`.th-p${p}`);
+        if (th) th.innerText = playerNames[p];
     }
+    updateTableHighlights();
+}
 
-    socket.emit('updateState', {
-        roomId: myRoomId,
-        floor,
-        player,
-        platform,
-        value: newValue
-    });
+function updateFocusFloorUI() {
+    currentFloorLabel.innerText = `第 ${currentFocusFloor + 1} 層`;
+    
+    // Disable buttons on edges
+    prevFloorBtn.disabled = currentFocusFloor === 0;
+    nextFloorBtn.disabled = currentFocusFloor === 9;
+
+    if (!globalMatrix || globalMatrix.length === 0) return;
+
+    for (let pl = 0; pl < 4; pl++) {
+        const btn = document.querySelector(`.my-plat-btn[data-plat="${pl}"]`);
+        if (!btn) continue;
+        
+        const val = globalMatrix[currentFocusFloor][myPlayerId][pl];
+        
+        btn.classList.remove('state-wrong', 'state-correct');
+        btn.innerHTML = pl + 1;
+
+        if (val === -1) {
+            btn.classList.add('state-wrong');
+            btn.innerHTML = '❌';
+        } else if (val === 1) {
+            btn.classList.add('state-correct');
+            btn.innerHTML = '✅';
+        }
+    }
+}
+
+function updateCheatsheetRow(f) {
+    if (!globalMatrix) return;
+    const floorMatrix = globalMatrix[f];
+    
+    for (let p = 0; p < 4; p++) {
+        const cell = document.getElementById(`cs-${f}-${p}`);
+        if (!cell) continue;
+
+        let foundCorrect = -1;
+        for (let pl = 0; pl < 4; pl++) {
+            if (floorMatrix[p][pl] === 1) foundCorrect = pl;
+        }
+
+        if (foundCorrect !== -1) {
+            cell.innerText = foundCorrect + 1;
+            cell.className = `cs-cell td-correct ${p === myPlayerId ? 'my-col' : ''}`;
+        } else {
+            // Find if there are any failures to mark? Not needed, cheat sheet just shows correct path.
+            cell.innerText = '-';
+            cell.className = `cs-cell td-unknown ${p === myPlayerId ? 'my-col' : ''}`;
+        }
+    }
 }
 
 // Socket listening
 socket.on('initialState', (data) => {
     const { matrix, names } = data;
     playerNames = names;
+    globalMatrix = matrix;
 
-    // Recreate UI or update names
-    if (floorsContainer.children.length === 0) {
-        createMatrixUI();
-    } else {
-        updateLabels();
-    }
+    updateLabels();
+    updateFocusFloorUI();
     
-    // Apply full matrix
     for (let f = 0; f < 10; f++) {
-        updateFloorUI(f, matrix[f]);
+        updateCheatsheetRow(f);
     }
 
     if (myPlayerId !== -1) {
@@ -164,41 +269,15 @@ socket.on('namesUpdated', (names) => {
     }
 });
 
-socket.on('joinError', (msg) => {
-    alert(msg);
-    window.location.reload(); // Reload to reset state safely
-});
-
-function updateLabels() {
-    for (let p = 0; p < 4; p++) {
-        const labels = document.querySelectorAll(`.l-p${p}`);
-        labels.forEach(l => l.innerText = playerNames[p]);
-    }
-}
-
 socket.on('stateUpdated', (data) => {
     const { floor, matrix } = data;
-    updateFloorUI(floor, matrix);
+    globalMatrix[floor] = matrix;
+    
+    if (floor === currentFocusFloor) updateFocusFloorUI();
+    updateCheatsheetRow(floor);
 });
 
-function updateFloorUI(floor, floorMatrix) {
-    for (let p = 0; p < 4; p++) {
-        for (let pl = 0; pl < 4; pl++) {
-            const val = floorMatrix[p][pl];
-            const btn = document.getElementById(`btn-${floor}-${p}-${pl}`);
-            if (!btn) continue;
-
-            // Reset classes
-            btn.classList.remove('state-wrong', 'state-correct');
-            btn.innerHTML = pl + 1;
-
-            if (val === -1) {
-                btn.classList.add('state-wrong');
-                btn.innerHTML = '❌';
-            } else if (val === 1) {
-                btn.classList.add('state-correct');
-                btn.innerHTML = '✅';
-            }
-        }
-    }
-}
+socket.on('joinError', (msg) => {
+    alert(msg);
+    window.location.reload();
+});

@@ -39,19 +39,56 @@
     </div>
 
     <!-- Main App Screen -->
-    <div id="app-screen" class="glass-panel hidden">
+    <div id="app-screen" class="glass-panel hidden wide-panel">
         <header>
             <div class="room-info">
                 <h2>房間: <span id="display-room">---</span></h2>
                 <div class="my-identity" id="display-identity">我是角色: ---</div>
             </div>
-            <button id="reset-btn" class="danger-btn">重置全場狀態</button>
+            <button id="reset-btn" class="danger-btn">全局重置</button>
         </header>
 
-        <!-- Floor Container: Floors 10 down to 1 -->
-        <main id="floors-container">
-            <!-- Will be populated by JS -->
-        </main>
+        <div class="app-layout">
+            <!-- Left/Top: Action Card -->
+            <section class="action-section">
+                <div class="action-card">
+                    <div class="floor-nav">
+                        <button id="prev-floor-btn" class="icon-btn">⬅️ 退回</button>
+                        <h3 id="current-floor-label">第 1 層</h3>
+                        <button id="next-floor-btn" class="icon-btn">前進 ➡️</button>
+                    </div>
+                    <div class="action-buttons-wrapper">
+                        <div class="action-buttons" id="action-buttons-container">
+                            <!-- Buttons rendered via JS based on player color -->
+                            <button class="plat-btn my-plat-btn" data-plat="0">1</button>
+                            <button class="plat-btn my-plat-btn" data-plat="1">2</button>
+                            <button class="plat-btn my-plat-btn" data-plat="2">3</button>
+                            <button class="plat-btn my-plat-btn" data-plat="3">4</button>
+                        </div>
+                        <div class="floor-plate"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right/Bottom: Cheat Sheet Table -->
+            <section class="cheatsheet-section">
+                <div class="cheatsheet-title">👁️ 全隊紀錄小抄</div>
+                <table class="cheato-table">
+                    <thead>
+                        <tr>
+                            <th>樓層</th>
+                            <th class="th-p0">玩家 A</th>
+                            <th class="th-p1">玩家 B</th>
+                            <th class="th-p2">玩家 C</th>
+                            <th class="th-p3">玩家 D</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cheatsheet-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </section>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
