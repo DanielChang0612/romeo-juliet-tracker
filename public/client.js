@@ -105,27 +105,37 @@ actionBtns.forEach(btn => {
         
         const platform = parseInt(e.target.getAttribute('data-plat'));
 
+        let existingCorrectPlatform = -1;
+        if (globalMatrix && globalMatrix[currentFocusFloor]) {
+            for (let i = 0; i < 4; i++) {
+                if (globalMatrix[currentFocusFloor][myPlayerId][i] === 1) {
+                    existingCorrectPlatform = i;
+                }
+            }
+        }
+
         let newValue = 1; // Default to Complete (✅)
         if (e.target.classList.contains('state-correct')) {
             newValue = -1; // Toggle to Wrong (❌)
         } else if (e.target.classList.contains('state-wrong')) {
-            newValue = 0; // Toggle to Unknown
+            if (existingCorrectPlatform !== -1) {
+                // Radio override: they have a ✅ elsewhere, and clicked this deduced ❌. They want to move the ✅ here.
+                newValue = 1;
+            } else {
+                // Normal undo of a manual ❌
+                newValue = 0; 
+            }
         }
 
-        // UX: Radio behavior if setting to correct
-        if (newValue === 1) {
-            for (let i = 0; i < 4; i++) {
-                if (i !== platform && globalMatrix[currentFocusFloor][myPlayerId][i] === 1) {
-                    // Send an undo for the old one immediately
-                    socket.emit('updateState', {
-                        roomId: myRoomId,
-                        floor: currentFocusFloor,
-                        player: myPlayerId,
-                        platform: i,
-                        value: 0
-                    });
-                }
-            }
+        // UX: Radio behavior if setting to correct and there is already one elsewhere
+        if (newValue === 1 && existingCorrectPlatform !== -1 && existingCorrectPlatform !== platform) {
+            socket.emit('updateState', {
+                roomId: myRoomId,
+                floor: currentFocusFloor,
+                player: myPlayerId,
+                platform: existingCorrectPlatform,
+                value: 0
+            });
         }
 
         // Before sending update, predict auto-scroll
