@@ -18,6 +18,7 @@ const actionBtns = document.querySelectorAll('.my-plat-btn');
 
 // Cheatsheet Elements
 const cheatsheetBody = document.getElementById('cheatsheet-body');
+const pathDisplay = document.getElementById('my-path-display');
 
 // State
 let myRoomId = '';
@@ -166,7 +167,7 @@ actionBtns.forEach(btn => {
 // Construct empty cheat sheet
 function initCheatsheetUI() {
     cheatsheetBody.innerHTML = '';
-    for (let f = 0; f < 10; f++) {
+    for (let f = 9; f >= 0; f--) {
         const tr = document.createElement('tr');
         tr.innerHTML = `<td style="color:var(--text-muted); font-size:0.9rem;">第 ${f + 1} 層</td>
             <td id="cs-${f}-0" class="cs-cell">-</td>
@@ -178,27 +179,11 @@ function initCheatsheetUI() {
 }
 
 // Ensure the th/td representing the current user is subtly highlighted in the table
-function updateTableHighlights() {
-    for (let p = 0; p < 4; p++) {
-        const th = document.querySelector(`.th-p${p}`);
-        if(th) {
-            th.classList.toggle('my-col-th', p === myPlayerId);
-        }
-        for (let f = 0; f < 10; f++) {
-            const td = document.getElementById(`cs-${f}-${p}`);
-            if (td) {
-                td.classList.toggle('my-col', p === myPlayerId);
-            }
-        }
-    }
-}
-
 function updateLabels() {
-    for (let p = 0; p < 4; p++) {
-        const th = document.querySelector(`.th-p${p}`);
-        if (th) th.innerText = playerNames[p];
+    // Re-render cheatsheet entirely on name change
+    for (let f = 0; f < 10; f++) {
+        updateCheatsheetRow(f);
     }
-    updateTableHighlights();
 }
 
 function updateFocusFloorUI() {
@@ -233,23 +218,45 @@ function updateCheatsheetRow(f) {
     if (!globalMatrix) return;
     const floorMatrix = globalMatrix[f];
     
-    for (let p = 0; p < 4; p++) {
-        const cell = document.getElementById(`cs-${f}-${p}`);
+    // pl represents platform (0-3) which aligns with table columns
+    for (let pl = 0; pl < 4; pl++) {
+        const cell = document.getElementById(`cs-${f}-${pl}`);
         if (!cell) continue;
 
-        let foundCorrect = -1;
-        for (let pl = 0; pl < 4; pl++) {
-            if (floorMatrix[p][pl] === 1) foundCorrect = pl;
+        let foundPlayer = -1;
+        for (let p = 0; p < 4; p++) {
+            if (floorMatrix[p][pl] === 1) foundPlayer = p;
         }
 
-        if (foundCorrect !== -1) {
-            cell.innerText = foundCorrect + 1;
-            cell.className = `cs-cell td-correct ${p === myPlayerId ? 'my-col' : ''}`;
+        if (foundPlayer !== -1) {
+            cell.innerHTML = `<span class="cs-badge p${foundPlayer}">${playerNames[foundPlayer]}</span>`;
+            cell.className = 'cs-cell'; // Strip other state classes
         } else {
-            // Find if there are any failures to mark? Not needed, cheat sheet just shows correct path.
             cell.innerText = '-';
-            cell.className = `cs-cell td-unknown ${p === myPlayerId ? 'my-col' : ''}`;
+            cell.className = 'cs-cell td-unknown';
         }
+    }
+}
+
+function updateMyPathDisplay() {
+    if (!globalMatrix || globalMatrix.length === 0 || myPlayerId === -1) return;
+    
+    let htmlStr = "";
+    for (let f = 0; f < 10; f++) {
+        const floorMatrix = globalMatrix[f];
+        let found = "?";
+        for (let pl = 0; pl < 4; pl++) {
+            if (floorMatrix[myPlayerId][pl] === 1) {
+                found = (pl + 1).toString();
+            }
+        }
+        htmlStr += found;
+        if (f === 4) htmlStr += "&nbsp;&nbsp;&nbsp;";
+        else if (f < 9) htmlStr += "&nbsp;";
+    }
+    
+    if (pathDisplay) {
+        pathDisplay.innerHTML = htmlStr;
     }
 }
 
@@ -268,6 +275,7 @@ socket.on('initialState', (data) => {
 
     if (myPlayerId !== -1) {
         displayIdentity.innerText = `我是角色: ${playerNames[myPlayerId]}`;
+        updateMyPathDisplay();
     }
 });
 
@@ -276,6 +284,7 @@ socket.on('namesUpdated', (names) => {
     updateLabels();
     if (myPlayerId !== -1) {
         displayIdentity.innerText = `我是角色: ${playerNames[myPlayerId]}`;
+        updateMyPathDisplay();
     }
 });
 
@@ -285,9 +294,21 @@ socket.on('stateUpdated', (data) => {
     
     if (floor === currentFocusFloor) updateFocusFloorUI();
     updateCheatsheetRow(floor);
+    updateMyPathDisplay();
 });
 
 socket.on('joinError', (msg) => {
     alert(msg);
     window.location.reload();
+});
+
+socket.on('roomReset', (matrix) => {
+    globalMatrix = matrix;
+    currentFocusFloor = 0; // Force all connected clients back to floor 1
+    updateFocusFloorUI();
+    
+    for (let f = 0; f < 10; f++) {
+        updateCheatsheetRow(f);
+    }
+    updateMyPathDisplay();
 });

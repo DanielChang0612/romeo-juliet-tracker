@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>楓之谷: 羅密歐與茱麗葉 實時同步推斷器</title>
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=7">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -15,6 +15,7 @@
     <!-- Login / Lobby Screen -->
     <div id="login-screen" class="glass-panel active">
         <h1>Romeo & Juliet<br><span>PQ Tracker</span></h1>
+        <div class="guild-badge">✨ PiKaPi 公會專屬製作 ✨</div>
         <div class="input-group">
             <label>邀請碼 / 房間代號</label>
             <div style="display: flex; gap: 10px;">
@@ -25,7 +26,7 @@
         <div class="input-group">
             <label>選擇你的身份角色</label>
             <div class="player-select">
-                <button class="player-btn p0 selected" data-id="0">玩家 A</button>
+                <button class="player-btn p0" data-id="0">玩家 A</button>
                 <button class="player-btn p1" data-id="1">玩家 B</button>
                 <button class="player-btn p2" data-id="2">玩家 C</button>
                 <button class="player-btn p3" data-id="3">玩家 D</button>
@@ -45,7 +46,10 @@
                 <h2>房間: <span id="display-room">---</span></h2>
                 <div class="my-identity" id="display-identity">我是角色: ---</div>
             </div>
-            <button id="reset-btn" class="danger-btn">全局重置</button>
+            <div class="header-right">
+                <div class="guild-badge-small">🛡️ PiKaPi</div>
+                <button id="reset-btn" class="danger-btn">全局重置</button>
+            </div>
         </header>
 
         <div class="app-layout">
@@ -68,6 +72,12 @@
                         <div class="floor-plate"></div>
                     </div>
                 </div>
+                
+                <!-- My Path Tracker -->
+                <div class="my-path-card">
+                    <span class="path-label">我的路徑</span>
+                    <span class="path-values" id="my-path-display">? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp;&nbsp;&nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ?</span>
+                </div>
             </section>
 
             <!-- Right/Bottom: Cheat Sheet Table -->
@@ -77,10 +87,10 @@
                     <thead>
                         <tr>
                             <th>樓層</th>
-                            <th class="th-p0">玩家 A</th>
-                            <th class="th-p1">玩家 B</th>
-                            <th class="th-p2">玩家 C</th>
-                            <th class="th-p3">玩家 D</th>
+                            <th>平台 1</th>
+                            <th>平台 2</th>
+                            <th>平台 3</th>
+                            <th>平台 4</th>
                         </tr>
                     </thead>
                     <tbody id="cheatsheet-body">
@@ -92,6 +102,6 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="client.js?v=2"></script>
+    <script src="client.js?v=7"></script>
 </body>
 </html>

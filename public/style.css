@@ -125,6 +125,34 @@ h1 span {
     -webkit-text-fill-color: transparent;
 }
 
+/* Guild Badge */
+.guild-badge {
+    text-align: center;
+    color: #fdba74;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-top: -20px;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(253, 186, 116, 0.3);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.guild-badge-small {
+    color: #fdba74;
+    font-size: 0.8rem;
+    font-weight: 800;
+    background: rgba(253, 186, 116, 0.1);
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(253, 186, 116, 0.3);
+    letter-spacing: 1px;
+}
+
 /* Inputs & Buttons */
 .input-group {
     margin-bottom: 25px;
@@ -360,6 +388,31 @@ header {
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
 }
 
+/* My Path Tracker */
+.my-path-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 15px 20px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+.path-label {
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 600;
+}
+.path-values {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #e2e8f0;
+}
+
 /* Cheat Sheet Table */
 .cheatsheet-section {
     background: rgba(0,0,0,0.3);
@@ -411,13 +464,24 @@ header {
     transition: background 0.3s;
 }
 
-/* Highlight my column */
-.my-col {
-    background: rgba(255,255,255,0.08);
+/* Cheat Sheet Badge */
+.cs-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: white;
+    display: inline-block;
+    max-width: 65px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
 }
-.my-col-th {
-    color: #f8fafc !important;
-}
+.cs-badge.p0 { background: var(--color-p0); }
+.cs-badge.p1 { background: var(--color-p1); box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); } 
+.cs-badge.p2 { background: var(--color-p2); }
+.cs-badge.p3 { background: var(--color-p3); color: #111827; }
 
 /* Data states in table */
 .td-correct { color: var(--color-success); text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
@@ -426,10 +490,43 @@ header {
 @media (max-width: 600px) {
     body { padding: 0; }
     .glass-panel { border-radius: 0; border: none; min-height: 100vh; padding: 20px 10px; }
-    .action-card { border: none; background: transparent; padding: 10px; box-shadow: none; }
-    .cheatsheet-section { border-radius: 20px 20px 0 0; border-width: 1px 0 0 0; }
-    
-    .plat-btn { padding: 15px 0; font-size: 1.2rem; border-width: 1px; }
     h1 { font-size: 2rem; margin-top: 20px; }
-    .cheatsheet-section { max-height: 50vh; }
+
+    header { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .header-right { width: 100%; justify-content: space-between; }
+
+    .action-card { border: none; background: transparent; padding: 10px; box-shadow: none; }
+    .action-buttons-wrapper { padding: 25px 10px 30px 10px; }
+    .action-buttons { gap: 10px; }
+    .plat-btn { padding: 12px 0; font-size: 1.2rem; border-width: 2px; }
+
+    .my-path-card { flex-direction: column; gap: 8px; padding: 15px; margin-top: 5px; }
+    .path-values { 
+        font-size: 1.4rem; 
+        white-space: nowrap; 
+        letter-spacing: 2px; 
+    }
+
+    .cheatsheet-section { 
+        border-radius: 20px 20px 0 0; 
+        border-width: 1px 0 0 0; 
+        margin-top: 10px; 
+        max-height: 55vh; 
+    }
+    .table-container { 
+        overflow-x: auto; 
+        padding-right: 0; 
+        margin-right: -10px; /* pull to edge */
+        margin-left: -10px;
+    }
+    .cheato-table th, .cheato-table td {
+        padding: 10px 6px;
+        white-space: nowrap;
+        font-size: 0.95rem;
+    }
+    .cs-badge {
+        font-size: 0.8rem;
+        padding: 4px 6px;
+        max-width: 55px;
+    }
 }

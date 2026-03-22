@@ -139,10 +139,7 @@ io.on('connection', (socket) => {
         if (!rooms[roomId]) return;
         rooms[roomId].matrix = getInitialMatrix();
         rooms[roomId].manualMatrix = getInitialMatrix();
-        io.to(roomId).emit('initialState', {
-            matrix: rooms[roomId].matrix,
-            names: rooms[roomId].names
-        });
+        io.to(roomId).emit('roomReset', rooms[roomId].matrix);
     });
 
     socket.on('disconnect', () => {
