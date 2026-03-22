@@ -44,6 +44,11 @@ playerBtns.forEach(btn => {
         playerBtns.forEach(b => b.classList.remove('selected'));
         e.target.classList.add('selected');
         myPlayerId = parseInt(e.target.getAttribute('data-id'));
+        
+        const nameGroup = document.getElementById('name-input-group');
+        if (nameGroup) {
+            nameGroup.style.display = myPlayerId === 4 ? 'none' : 'block';
+        }
     });
 });
 
@@ -108,9 +113,18 @@ joinBtn.addEventListener('click', () => {
     displayRoom.innerText = myRoomId;
     
     // Optimistic update of own identity name
-    if (customName) playerNames[myPlayerId] = customName;
-    displayIdentity.innerText = `我是角色: ${playerNames[myPlayerId]}`;
-    displayIdentity.style.color = `var(--color-p${myPlayerId})`;
+    if (myPlayerId < 4) {
+        if (customName) playerNames[myPlayerId] = customName;
+        displayIdentity.innerText = `我是角色: ${playerNames[myPlayerId]}`;
+        displayIdentity.style.color = `var(--color-p${myPlayerId})`;
+    } else {
+        displayIdentity.innerText = `我是狀態: 觀眾模式 (僅觀看)`;
+        displayIdentity.style.color = `var(--text-muted)`;
+        if (resetBtn) resetBtn.style.display = 'none';
+        
+        const pathCard = document.querySelector('.my-path-card');
+        if (pathCard) pathCard.style.display = 'none';
+    }
 
     loginScreen.classList.remove('active');
     setTimeout(() => {
@@ -192,6 +206,7 @@ function computeFocusFloor() {
 
 // Handle physical button click cleanly
 function handlePlatformClick(floor, platform) {
+    if (myPlayerId === 4) return; // Spectator cannot click
     if (!globalMatrix || globalMatrix.length === 0 || myPlayerId === -1) return;
     
     let existingCorrectPlatform = -1;
@@ -239,14 +254,13 @@ function renderControlBoardState() {
             }
             
             // Reset state logically
-            btn.className = `plat-btn my-plat-btn border-p${myPlayerId !== -1 ? myPlayerId : 0}`;
+            btn.className = `plat-btn my-plat-btn border-p${myPlayerId !== -1 && myPlayerId < 4 ? myPlayerId : 0}`;
             btn.innerHTML = pl + 1;
             
             if (globalCorrectPlayer !== -1) {
-                // Fill color entirely, no numbers shown
+                // Fill color entirely, number remains visible
                 btn.classList.add('state-correct', `btn-bg-p${globalCorrectPlayer}`);
-                btn.innerHTML = '';
-            } else if (myPlayerId !== -1) {
+            } else if (myPlayerId !== -1 && myPlayerId < 4) {
                 // Not globally correct. Check MY state
                 const myVal = floorMatrix[myPlayerId][pl];
                 if (myVal === -1) {
@@ -260,6 +274,7 @@ function renderControlBoardState() {
 }
 
 function updateMyPathDisplay() {
+    if (myPlayerId === 4) return; // Spectator doesn't have a path
     if (!globalMatrix || globalMatrix.length === 0 || myPlayerId === -1) return;
     
     let htmlStr = "";

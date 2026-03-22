@@ -132,9 +132,11 @@ io.on('connection', (socket) => {
         }
         
         // Slot Locking check
-        if (rooms[roomId].taken[playerId] && rooms[roomId].taken[playerId] !== socket.id) {
-            socket.emit('joinError', '抱歉！這個角色已經被其他人選走囉！請換一個角色登入。');
-            return;
+        if (playerId >= 0 && playerId < 4) {
+            if (rooms[roomId].taken[playerId] && rooms[roomId].taken[playerId] !== socket.id) {
+                socket.emit('joinError', '抱歉！這個角色已經被其他人選走囉！請換一個角色登入。');
+                return;
+            }
         }
 
         socket.join(roomId);

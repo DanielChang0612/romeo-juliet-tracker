@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>楓之谷: 羅密歐與茱麗葉 實時同步推斷器</title>
-    <link rel="stylesheet" href="style.css?v=20">
+    <link rel="stylesheet" href="style.css?v=22">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -32,8 +32,9 @@
                 <button class="player-btn p2" data-id="2">玩家 C</button>
                 <button class="player-btn p3" data-id="3">玩家 D</button>
             </div>
+            <button class="player-btn observer-btn" style="width: 100%; margin-top: 15px;" data-id="4">👁️ 觀眾模式 (僅觀看)</button>
         </div>
-        <div class="input-group">
+        <div class="input-group" id="name-input-group">
             <label>輸入你的遊戲 ID (選填)</label>
             <input type="text" id="my-name-input" placeholder="例如: 雙刀流" maxlength="10">
         </div>
@@ -74,6 +75,6 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="client.js?v=20"></script>
+    <script src="client.js?v=22"></script>
 </body>
 </html>

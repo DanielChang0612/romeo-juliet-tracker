@@ -502,10 +502,10 @@ header {
 }
 
 /* Solid color fills */
-.btn-bg-p0 { background: var(--color-p0) !important; border-color: var(--color-p0) !important; color: transparent !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; }
-.btn-bg-p1 { background: var(--color-p1) !important; border-color: var(--color-p1) !important; color: transparent !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; }
-.btn-bg-p2 { background: var(--color-p2) !important; border-color: var(--color-p2) !important; color: transparent !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; }
-.btn-bg-p3 { background: var(--color-p3) !important; border-color: var(--color-p3) !important; color: transparent !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; }
+.btn-bg-p0 { background: var(--color-p0) !important; border-color: var(--color-p0) !important; color: white !important; font-weight: 800 !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; text-shadow: 0 1px 3px rgba(0,0,0,0.5) !important; }
+.btn-bg-p1 { background: var(--color-p1) !important; border-color: var(--color-p1) !important; color: white !important; font-weight: 800 !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; text-shadow: 0 1px 3px rgba(0,0,0,0.5) !important; }
+.btn-bg-p2 { background: var(--color-p2) !important; border-color: var(--color-p2) !important; color: white !important; font-weight: 800 !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; text-shadow: 0 1px 3px rgba(0,0,0,0.5) !important; }
+.btn-bg-p3 { background: var(--color-p3) !important; border-color: var(--color-p3) !important; color: white !important; font-weight: 800 !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; text-shadow: 0 1px 3px rgba(0,0,0,0.5) !important; }
 
 @media (max-width: 600px) {
     body { padding: 0; }
