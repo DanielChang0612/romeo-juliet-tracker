@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>楓之谷: 羅密歐與茱麗葉 實時同步推斷器</title>
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=20">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -17,10 +17,11 @@
         <h1>Romeo & Juliet<br><span>PQ Tracker</span></h1>
         <div class="guild-badge">✨ PiKaPi 公會專屬製作 ✨</div>
         <div class="input-group">
-            <label>邀請碼 / 房間代號</label>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="room-input" placeholder="例如: 8888" value="8888">
-                <button id="random-room-btn" class="secondary-btn" style="flex-shrink: 0;">🎲 隨機產生</button>
+            <label>房間代號 (4~6碼)</label>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="room-input" placeholder="例如: ABCD" maxlength="6" style="flex:1; min-width: 0;">
+                <button id="random-room-btn" class="secondary-btn" style="flex-shrink: 0; padding: 0 10px;">🎲 隨機</button>
+                <button id="copy-link-btn" class="secondary-btn" style="flex-shrink: 0; padding: 0 10px;">🔗 複製邀請</button>
             </div>
         </div>
         <div class="input-group">
@@ -45,63 +46,34 @@
             <div class="room-info">
                 <h2>房間: <span id="display-room">---</span></h2>
                 <div class="my-identity" id="display-identity">我是角色: ---</div>
+                <div class="room-players-indicator">
+                    <span class="player-dot" id="dot-p0"></span>
+                    <span class="player-dot" id="dot-p1"></span>
+                    <span class="player-dot" id="dot-p2"></span>
+                    <span class="player-dot" id="dot-p3"></span>
+                </div>
             </div>
+            
+            <div id="slacker-banner" class="slacker-banner hidden"></div>
+
             <div class="header-right">
                 <div class="guild-badge-small">🛡️ PiKaPi</div>
                 <button id="reset-btn" class="danger-btn">全局重置</button>
             </div>
         </header>
 
-        <div class="app-layout">
-            <!-- Left/Top: Action Card -->
-            <section class="action-section">
-                <div class="action-card">
-                    <div class="floor-nav">
-                        <button id="prev-floor-btn" class="icon-btn">⬅️ 退回</button>
-                        <h3 id="current-floor-label">第 1 層</h3>
-                        <button id="next-floor-btn" class="icon-btn">前進 ➡️</button>
-                    </div>
-                    <div class="action-buttons-wrapper">
-                        <div class="action-buttons" id="action-buttons-container">
-                            <!-- Buttons rendered via JS based on player color -->
-                            <button class="plat-btn my-plat-btn" data-plat="0">1</button>
-                            <button class="plat-btn my-plat-btn" data-plat="1">2</button>
-                            <button class="plat-btn my-plat-btn" data-plat="2">3</button>
-                            <button class="plat-btn my-plat-btn" data-plat="3">4</button>
-                        </div>
-                        <div class="floor-plate"></div>
-                    </div>
-                </div>
-                
-                <!-- My Path Tracker -->
-                <div class="my-path-card">
-                    <span class="path-label">我的路徑</span>
-                    <span class="path-values" id="my-path-display">? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp;&nbsp;&nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ?</span>
-                </div>
-            </section>
+        <!-- My Path Tracker -->
+        <div class="my-path-card" style="margin-bottom: 20px;">
+            <span class="path-label">我的路徑</span>
+            <span class="path-values" id="my-path-display">? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp;&nbsp;&nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ?</span>
+        </div>
 
-            <!-- Right/Bottom: Cheat Sheet Table -->
-            <section class="cheatsheet-section">
-                <div class="cheatsheet-title">👁️ 全隊紀錄小抄</div>
-                <table class="cheato-table">
-                    <thead>
-                        <tr>
-                            <th>樓層</th>
-                            <th>平台 1</th>
-                            <th>平台 2</th>
-                            <th>平台 3</th>
-                            <th>平台 4</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cheatsheet-body">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </section>
+        <div class="control-board" id="control-board">
+            <!-- JS generates the floor rows -->
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="client.js?v=7"></script>
+    <script src="client.js?v=20"></script>
 </body>
 </html>

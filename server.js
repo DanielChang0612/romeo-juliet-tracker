@@ -87,8 +87,44 @@ function runDeduction(matrix, floor) {
     } while (changed);
 }
 
+function broadcastRoomPlayers(io, roomId) {
+    if (rooms[roomId]) {
+        const takenStatus = rooms[roomId].taken.map(t => !!t);
+        io.to(roomId).emit('playersUpdated', { taken: takenStatus, names: rooms[roomId].names });
+    }
+}
+
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
+
+    socket.on('watchRoom', (roomId) => {
+        if (!roomId || typeof roomId !== 'string') return;
+        roomId = roomId.toUpperCase();
+        socket.rooms.forEach(r => {
+            if (r !== socket.id && r !== roomId) socket.leave(r);
+        });
+        socket.join(roomId);
+        if (rooms[roomId]) {
+            socket.emit('playersUpdated', {
+                taken: rooms[roomId].taken.map(t => !!t),
+                names: rooms[roomId].names
+            });
+        } else {
+            socket.emit('playersUpdated', {
+                taken: [false, false, false, false],
+                names: ['玩家 A', '玩家 B', '玩家 C', '玩家 D']
+            });
+        }
+    });
+
+    socket.on('requestTakenStatus', () => {
+        if (socket.roomId && rooms[socket.roomId]) {
+            socket.emit('playersUpdated', {
+                taken: rooms[socket.roomId].taken.map(t => !!t),
+                names: rooms[socket.roomId].names
+            });
+        }
+    });
 
     socket.on('joinRoom', ({ roomId, playerId, playerName }) => {
         if (!rooms[roomId]) {
@@ -109,11 +145,14 @@ io.on('connection', (socket) => {
         if (playerId >= 0 && playerId < 4 && playerName && playerName.trim() !== '') {
             rooms[roomId].names[playerId] = playerName.substring(0, 10);
         }
+        
         socket.emit('initialState', {
             matrix: rooms[roomId].matrix,
-            names: rooms[roomId].names
+            names: rooms[roomId].names,
+            taken: rooms[roomId].taken.map(t => !!t)
         });
         socket.to(roomId).emit('namesUpdated', rooms[roomId].names);
+        broadcastRoomPlayers(io, roomId);
     });
 
     socket.on('updateState', ({ roomId, floor, player, platform, value }) => {
@@ -147,6 +186,7 @@ io.on('connection', (socket) => {
         if (socket.roomId && rooms[socket.roomId]) {
             if (socket.playerId !== undefined) {
                 rooms[socket.roomId].taken[socket.playerId] = null;
+                broadcastRoomPlayers(io, socket.roomId);
             }
         }
     });
