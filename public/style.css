@@ -139,8 +139,9 @@ h1 span {
 
 .header-right {
     display: flex;
-    align-items: center;
-    gap: 15px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
 }
 .guild-badge-small {
     color: #fdba74;
@@ -531,4 +532,72 @@ header {
     .slacker-banner { font-size: 0.85rem; max-width: 100%; margin: 0; }
     
     .floor-num { width: 28px; font-size: 1rem; }
+    #my-name-input { font-size: 0.9rem; padding: 12px; }
 }
+
+/* Members Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.modal-content {
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+.modal-overlay.hidden .modal-content {
+    transform: translateY(20px);
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 10px;
+}
+.modal-header h3 { font-size: 1.2rem; font-weight: 800; margin: 0; }
+.close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: 0.3s;
+    line-height: 1;
+}
+.close-btn:hover { color: white; }
+
+.member-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    margin-bottom: 8px;
+    border: 1px solid var(--glass-border);
+}
+.member-color-box {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+.member-name { font-weight: 600; font-size: 1rem; text-shadow: 0 0 10px rgba(0,0,0,0.5); }

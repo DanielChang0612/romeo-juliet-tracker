@@ -11,6 +11,10 @@ const displayIdentity = document.getElementById('display-identity');
 const resetBtn = document.getElementById('reset-btn');
 const randomRoomBtn = document.getElementById('random-room-btn');
 const copyLinkBtn = document.getElementById('copy-link-btn');
+const membersBtn = document.getElementById('members-btn');
+const membersModal = document.getElementById('members-modal');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const membersList = document.getElementById('members-list');
 
 // Control Board & Path Elements
 const pathDisplay = document.getElementById('my-path-display');
@@ -21,6 +25,7 @@ let myRoomId = '';
 let myPlayerId = -1; 
 let playerNames = ['玩家 A', '玩家 B', '玩家 C', '玩家 D'];
 let globalMatrix = []; // stores matrix passed from server
+let globalTakenStatus = [false, false, false, false]; // Added to track raw slot availability 
 let watchTimeout = null; // Added
 
 // Check URL for Room Invite Code On Load
@@ -169,6 +174,51 @@ function initControlBoardUI() {
         `;
         controlBoard.appendChild(row);
     }
+}
+
+// Modal Logic
+if (membersBtn) {
+    membersBtn.addEventListener('click', () => {
+        renderMembersModal();
+        membersModal.classList.remove('hidden');
+    });
+}
+if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', () => {
+        membersModal.classList.add('hidden');
+    });
+}
+if (membersModal) {
+    membersModal.addEventListener('click', (e) => {
+        if (e.target === membersModal) {
+            membersModal.classList.add('hidden');
+        }
+    });
+}
+
+function renderMembersModal() {
+    if (!membersList) return;
+    let html = '';
+    for (let i = 0; i < 4; i++) {
+        let nameToDisplay;
+        let dimStyle = '';
+        
+        if (globalTakenStatus[i]) {
+            const customName = playerNames[i] ? playerNames[i] : `玩家 ${String.fromCharCode(65+i)}`;
+            nameToDisplay = `<span>${customName}</span><span style="font-size: 0.75rem; margin-left: 8px; color: #86efac; font-weight: normal;">(準備完成)</span>`;
+        } else {
+            nameToDisplay = `<span style="opacity: 0.5;">N/A</span><span style="font-size: 0.75rem; margin-left: 8px; color: var(--text-muted); font-weight: normal;">(空位)</span>`;
+            dimStyle = 'filter: grayscale(80%); opacity: 0.5;';
+        }
+        
+        html += `
+            <div class="member-item" style="${dimStyle}">
+                <div class="member-color-box" style="background: var(--color-p${i}); box-shadow: 0 0 8px var(--color-p${i})"></div>
+                <div class="member-name" style="color: white; display: flex; align-items: baseline;">${nameToDisplay}</div>
+            </div>
+        `;
+    }
+    membersList.innerHTML = html;
 }
 
 function computeFocusFloor() {
@@ -405,6 +455,8 @@ socket.on('playersUpdated', (payload) => {
     let takenStatus = Array.isArray(payload) ? payload : payload.taken;
     let names = Array.isArray(payload) ? null : payload.names;
 
+    globalTakenStatus = takenStatus; // Track locally for modal rendering
+
     // header dots
     for (let i = 0; i < 4; i++) {
         const dot = document.getElementById(`dot-p${i}`);
@@ -415,6 +467,9 @@ socket.on('playersUpdated', (payload) => {
     }
     
     updateLobbyPlayerBtns(takenStatus, names);
+    if (membersModal && !membersModal.classList.contains('hidden')) {
+        renderMembersModal(); // Live update if the modal is currently open
+    }
 });
 
 socket.on('joinError', (msg) => {
