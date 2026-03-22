@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>楓之谷: 羅密歐與茱麗葉 實時同步推斷器</title>
+    <link rel="stylesheet" href="style.css?v=8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    <div class="bg-shape shape3"></div>
+
+    <!-- Login / Lobby Screen -->
+    <div id="login-screen" class="glass-panel active">
+        <h1>Romeo & Juliet<br><span>PQ Tracker</span></h1>
+        <div class="guild-badge">✨ PiKaPi 公會專屬製作 ✨</div>
+        <div class="input-group">
+            <label>邀請碼 / 房間代號</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="room-input" placeholder="例如: 8888" value="8888">
+                <button id="random-room-btn" class="secondary-btn" style="flex-shrink: 0;">🎲 隨機產生</button>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>選擇你的身份角色</label>
+            <div class="player-select">
+                <button class="player-btn p0" data-id="0">玩家 A</button>
+                <button class="player-btn p1" data-id="1">玩家 B</button>
+                <button class="player-btn p2" data-id="2">玩家 C</button>
+                <button class="player-btn p3" data-id="3">玩家 D</button>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>輸入你的遊戲 ID (選填)</label>
+            <input type="text" id="my-name-input" placeholder="例如: 雙刀流" maxlength="10">
+        </div>
+        <button id="join-btn" class="primary-btn">進入實時戰場</button>
+    </div>
+
+    <!-- Main App Screen -->
+    <div id="app-screen" class="glass-panel hidden wide-panel">
+        <header>
+            <div class="room-info">
+                <h2>房間: <span id="display-room">---</span></h2>
+                <div class="my-identity" id="display-identity">我是角色: ---</div>
+            </div>
+            <div class="header-right">
+                <div class="guild-badge-small">🛡️ PiKaPi</div>
+                <button id="reset-btn" class="danger-btn">全局重置</button>
+            </div>
+        </header>
+
+        <!-- My Path Tracker -->
+        <div class="my-path-card" style="margin-bottom: 20px;">
+            <span class="path-label">我的路徑</span>
+            <span class="path-values" id="my-path-display">? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp;&nbsp;&nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ?</span>
+        </div>
+
+        <div class="accordion-board" id="accordion-board">
+            <!-- JS generates the floor rows -->
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js?v=9"></script>
+</body>
+</html>

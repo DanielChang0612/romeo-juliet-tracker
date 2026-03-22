@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>楓之谷: 羅密歐與茱麗葉 實時同步推斷器</title>
-    <link rel="stylesheet" href="style.css?v=25">
+    <title>楓之谷: 羅密歐與茱麗葉 PQ 單機四開指揮官</title>
+    <link rel="stylesheet" href="style.css?v=solo_v11">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -12,82 +12,34 @@
     <div class="bg-shape shape2"></div>
     <div class="bg-shape shape3"></div>
 
-    <!-- Login / Lobby Screen -->
-    <div id="login-screen" class="glass-panel active">
-        <h1>Romeo & Juliet<br><span>PQ Tracker</span></h1>
-        <div class="guild-badge">✨ PiKaPi 公會專屬製作 ✨</div>
-        <div class="input-group">
-            <label>房間代號 (4~6碼)</label>
-            <div style="display:flex; gap:8px;">
-                <input type="text" id="room-input" placeholder="例如: ABCD" maxlength="6" style="flex:1; min-width: 0;">
-                <button id="random-room-btn" class="secondary-btn" style="flex-shrink: 0; padding: 0 10px;">🎲 隨機</button>
-                <button id="copy-link-btn" class="secondary-btn" style="flex-shrink: 0; padding: 0 10px;">🔗 複製邀請</button>
-            </div>
-        </div>
-        <div class="input-group">
-            <label>選擇你的身份角色</label>
-            <div class="player-select">
-                <button class="player-btn p0" data-id="0">玩家 A</button>
-                <button class="player-btn p1" data-id="1">玩家 B</button>
-                <button class="player-btn p2" data-id="2">玩家 C</button>
-                <button class="player-btn p3" data-id="3">玩家 D</button>
-            </div>
-            <button class="player-btn observer-btn" style="width: 100%; margin-top: 15px;" data-id="4">👁️ 觀眾模式 (僅觀看)</button>
-        </div>
-        <div class="input-group" id="name-input-group">
-            <label>輸入你的遊戲 ID (選填)</label>
-            <input type="text" id="my-name-input" placeholder="例如: 雙刀流" maxlength="10">
-        </div>
-        <button id="join-btn" class="primary-btn">進入實時戰場</button>
-    </div>
-
     <!-- Main App Screen -->
-    <div id="app-screen" class="glass-panel hidden wide-panel">
-        <header>
+    <div id="app-screen" class="glass-panel active wide-panel" style="margin-top: 20px;">
+        <header style="align-items: flex-start; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px;">
             <div class="room-info">
-                <h2>房間: <span id="display-room">---</span></h2>
-                <div class="my-identity" id="display-identity">我是角色: ---</div>
-                <div class="room-players-indicator">
-                    <span class="player-dot" id="dot-p0"></span>
-                    <span class="player-dot" id="dot-p1"></span>
-                    <span class="player-dot" id="dot-p2"></span>
-                    <span class="player-dot" id="dot-p3"></span>
-                </div>
+                <h2 style="font-size: 1.5rem; margin-bottom: 5px;">Romeo & Juliet <span>Solo Tracker</span></h2>
+                <div class="guild-badge-small" style="display: inline-block;">✨ 單機四開指揮官 ✨</div>
             </div>
             
             <div id="slacker-banner" class="slacker-banner hidden"></div>
 
+            <!-- Color Selector for Paint-Bucket Mode -->
+            <div class="bucket-selector" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; margin-top: 15px;">
+                <button class="color-bucket p0 active" data-color="0">紅</button>
+                <button class="color-bucket p1" data-color="1">黃</button>
+                <button class="color-bucket p2" data-color="2">綠</button>
+                <button class="color-bucket p3" data-color="3">藍</button>
+            </div>
+
             <div class="header-right">
-                <button id="members-btn" class="secondary-btn" style="width:100%; padding: 8px 12px; border-radius: 8px;">👥 房間成員</button>
-                <button id="reset-btn" class="danger-btn" style="width:100%; border-radius: 8px;">全局重置</button>
+                <button id="reset-btn" class="danger-btn" style="width:100%; border-radius: 8px; padding: 10px 15px; font-size: 1rem;">⚠️ 全局重置</button>
             </div>
         </header>
-
-        <!-- My Path Tracker -->
-        <div class="my-path-card" style="margin-bottom: 20px;">
-            <span class="path-label">我的路徑</span>
-            <span class="path-values" id="my-path-display">? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp;&nbsp;&nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ? &nbsp; ?</span>
-        </div>
 
         <div class="control-board" id="control-board">
             <!-- JS generates the floor rows -->
         </div>
     </div>
 
-    <!-- Members Modal -->
-    <div id="members-modal" class="modal-overlay hidden">
-        <div class="modal-content glass-panel">
-            <div class="modal-header">
-                <h3>👥 房間成員名單</h3>
-                <button id="close-modal-btn" class="close-btn">&times;</button>
-            </div>
-            <div id="members-list" class="members-list">
-                <!-- JS injected -->
-            </div>
-        </div>
-    </div>
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="client.js?v=25"></script>
+    <script src="client.js?v=solo_v11"></script>
 </body>
 </html>

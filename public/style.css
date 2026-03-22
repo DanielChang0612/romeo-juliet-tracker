@@ -7,9 +7,9 @@
     
     /* Player Colors */
     --color-p0: #ef4444; /* Red */
-    --color-p1: #3b82f6; /* Blue */
+    --color-p1: #eab308; /* Yellow */
     --color-p2: #22c55e; /* Green */
-    --color-p3: #eab308; /* Yellow */
+    --color-p3: #0ea5e9; /* Blue */
 
     /* Status Colors */
     --color-success: #10b981;
@@ -365,174 +365,130 @@ header {
     flex: 1;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 2px; /* Squeezed horizontally */
+    gap: 4px; /* Squeezed horizontally */
 }
 
+/* Color Bucket Selector */
+.color-bucket {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.color-bucket::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 4px; height: 100%;
+    transition: 0.3s;
+}
+
+.color-bucket.p0::before { background: var(--color-p0); }
+.color-bucket.p1::before { background: var(--color-p1); }
+.color-bucket.p2::before { background: var(--color-p2); }
+.color-bucket.p3::before { background: var(--color-p3); }
+
+.color-bucket:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.color-bucket.active {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: white;
+    color: white;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.color-bucket.active.p0 { border-color: var(--color-p0); box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+.color-bucket.active.p1 { border-color: var(--color-p1); box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); }
+.color-bucket.active.p2 { border-color: var(--color-p2); box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+.color-bucket.active.p3 { border-color: var(--color-p3); box-shadow: 0 0 15px rgba(14, 165, 233, 0.4); }
+
 .plat-btn {
-    background: rgba(255, 255, 255, 0.03); /* dark transparent square */
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 8px; /* Softer, subtle rectangle */
-    color: var(--text-muted); /* muted text initially */
-    font-size: 1.25rem; /* slightly scaled down to fit */
+    border-radius: 12px;
+    color: var(--text-muted);
+    font-size: 1.8rem;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 48px; /* Squeezed height to ensure 10 rows fit */
+    height: 60px;
     padding: 0;
-}
-.plat-btn:hover {
-    background: rgba(255,255,255,0.15);
-    transform: translateY(-2px);
-}
-.plat-btn:active {
-    transform: translateY(0);
-}
-
-.plat-btn .badge-text {
-    font-size: 0.85rem;
-    white-space: nowrap;
+    position: relative;
     overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 90%;
 }
 
-/* Base borders by player color to remind them who they are */
-.border-p0 { border-color: rgba(239, 68, 68, 0.5); }
-.border-p1 { border-color: rgba(59, 130, 246, 0.5); }
-.border-p2 { border-color: rgba(34, 197, 94, 0.5); }
-.border-p3 { border-color: rgba(234, 179, 8, 0.5); }
-
-/* States */
-.plat-btn.state-wrong {
-    background: rgba(244, 63, 94, 0.2) !important;
-    border-color: var(--color-error);
-    color: var(--color-error);
-}
-.plat-btn.state-correct {
-    border-color: var(--color-success);
-    color: white;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-}
-
-/* My Path Tracker */
-.my-path-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 6px 15px;
-    margin-top: 0px;
-    margin-bottom: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-.path-label {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-.path-values {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #e2e8f0;
-}
-
-/* Slacker Banner */
-.slacker-banner {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid transparent;
-    color: #fff;
-    padding: 0;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 0.95rem;
-    font-weight: 800;
-    margin: 0 10px;
-    align-self: center;
-    flex: 1;
-    max-width: 250px;
-    height: 0;
-    opacity: 0;
-    overflow: hidden;
+.plat-btn .plat-num {
+    z-index: 1;
     pointer-events: none;
-    transition: all 0.3s ease;
-}
-.slacker-banner.show {
-    opacity: 1;
-    height: auto;
-    padding: 6px 10px;
+    transition: 0.3s;
 }
 
-/* Colored Borders depending on Player Slacker */
-.slacker-banner.p0-border { border-color: var(--color-p0); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
-.slacker-banner.p1-border { border-color: var(--color-p1); box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
-.slacker-banner.p2-border { border-color: var(--color-p2); box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
-.slacker-banner.p3-border { border-color: var(--color-p3); box-shadow: 0 0 10px rgba(234, 179, 8, 0.5); }
+/* Cell background fill */
+.plat-btn.fill-p0 { background: rgba(239, 68, 68, 0.8) !important; border-color: var(--color-p0) !important; }
+.plat-btn.fill-p1 { background: rgba(234, 179, 8, 0.8) !important; border-color: var(--color-p1) !important; }
+.plat-btn.fill-p2 { background: rgba(34, 197, 94, 0.8) !important; border-color: var(--color-p2) !important; }
+.plat-btn.fill-p3 { background: rgba(14, 165, 233, 0.8) !important; border-color: var(--color-p3) !important; }
 
-/* specific border colors for Correct answers (Player Identifiers) */
-.btn-style-p0 { 
-    background: rgba(239, 68, 68, 0.15) !important; 
-    border-color: var(--color-p0) !important; 
-    color: var(--color-p0) !important; 
-    box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.2) !important;
+.plat-btn.fill-p0 .plat-num, .plat-btn.fill-p1 .plat-num, .plat-btn.fill-p2 .plat-num, .plat-btn.fill-p3 .plat-num {
+    color: white !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
-.btn-style-p1 { 
-    background: rgba(59, 130, 246, 0.15) !important; 
-    border-color: var(--color-p1) !important; 
-    color: var(--color-p1) !important; 
-    box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.2) !important;
-}
-.btn-style-p2 { 
-    background: rgba(34, 197, 94, 0.15) !important; 
-    border-color: var(--color-p2) !important; 
-    color: var(--color-p2) !important; 
-    box-shadow: inset 0 0 10px rgba(34, 197, 94, 0.2) !important;
-}
-.btn-style-p3 { 
-    background: rgba(234, 179, 8, 0.15) !important; 
-    border-color: var(--color-p3) !important; 
-    color: var(--color-p3) !important; 
-    box-shadow: inset 0 0 10px rgba(234, 179, 8, 0.2) !important;
-}
-
-/* Solid color fills */
-.btn-bg-p0 { background: var(--color-p0) !important; border-color: var(--color-p0) !important; color: white !important; font-weight: 800 !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; text-shadow: 0 1px 3px rgba(0,0,0,0.5) !important; }
-.btn-bg-p1 { background: var(--color-p1) !important; border-color: var(--color-p1) !important; color: white !important; font-weight: 800 !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; text-shadow: 0 1px 3px rgba(0,0,0,0.5) !important; }
-.btn-bg-p2 { background: var(--color-p2) !important; border-color: var(--color-p2) !important; color: white !important; font-weight: 800 !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; text-shadow: 0 1px 3px rgba(0,0,0,0.5) !important; }
-.btn-bg-p3 { background: var(--color-p3) !important; border-color: var(--color-p3) !important; color: white !important; font-weight: 800 !important; box-shadow: inset 0 0 5px rgba(0,0,0,0.2) !important; text-shadow: 0 1px 3px rgba(0,0,0,0.5) !important; }
 
 @media (max-width: 600px) {
-    body { padding: 0; }
-    #app, .login-container { margin: 8px; border-radius: 10px; padding: 15px 10px; }
-    h1 { font-size: 1.8rem; margin-top: 10px; margin-bottom: 10px; }
-
-    header { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 2px; padding-bottom: 2px; }
-    .room-info h2 { font-size: 1rem; margin-bottom: 2px; }
-    .my-identity { font-size: 0.8rem; margin-bottom: 2px; }
-    .header-right { width: auto; }
-    .util-btn { padding: 6px 10px; font-size: 0.85rem; }
-    .danger-btn { padding: 6px 10px; font-size: 0.85rem; }
-
-    .control-board { gap: 1px; }
-    .floor-row { padding: 0; }
-    .action-buttons { gap: 2px; }
-    .plat-btn { height: 42px; border-radius: 6px; font-size: 1.15rem; border-width: 1px; }
-
-    .my-path-card { flex-direction: row; gap: 8px; padding: 4px 8px; margin-top: 0; margin-bottom: 4px; justify-content: center; border-radius: 8px; }
-    .path-label { font-size: 0.8rem; }
-    .path-values { font-size: 1.1rem; letter-spacing: 0px; }
-
-    .slacker-banner { font-size: 0.85rem; max-width: 100%; margin: 0; }
+    body { padding: 4px; }
+    #app-screen { margin: 4px 0; border-radius: 12px; padding: 10px 6px; width: 100%; box-sizing: border-box; }
     
-    .floor-num { width: 28px; font-size: 1rem; }
-    #my-name-input { font-size: 0.9rem; padding: 12px; }
+    header { 
+        display: block; /* Stack elements vertically on mobile */
+        border-bottom: 1px solid rgba(255,255,255,0.05); 
+        padding-bottom: 8px; 
+        margin-bottom: 10px; 
+    }
+    
+    .room-info { width: 100%; margin-bottom: 10px; }
+    .room-info h2 { font-size: 1.2rem; margin-bottom: 4px; }
+    .guild-badge-small { font-size: 0.7rem; padding: 2px 6px; }
+    
+    .bucket-selector { 
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 6px !important; 
+        margin: 10px 0 !important; 
+        width: 100%;
+    }
+    .color-bucket { padding: 10px 2px; font-size: 0.9rem; border-radius: 8px; }
+    
+    .header-right { 
+        width: 100%; 
+        display: flex;
+        justify-content: flex-end;
+    }
+    #reset-btn { width: auto !important; padding: 6px 12px !important; font-size: 0.8rem !important; margin-top: 5px; }
+
+    .control-board { gap: 1px; width: 100%; }
+    .floor-row { padding: 0; min-height: 36px; width: 100%; }
+    .floor-num { width: 32px; font-size: 0.85rem; color: var(--text-muted); opacity: 0.7; }
+    
+    .action-buttons { gap: 2px; flex: 1; }
+    .plat-btn { height: 36px; border-radius: 4px; font-size: 1.2rem; }
+    
+    .floor-row.active-focus {
+        background: rgba(56, 189, 248, 0.08);
+        box-shadow: none;
+    }
 }
 
 /* Members Modal */
