@@ -131,16 +131,23 @@ io.on('connection', (socket) => {
             rooms[roomId] = getInitialRoom();
         }
         
-        // Slot Locking check
+        // Slot Locking check - Upgraded for Session Recovery
         if (playerId >= 0 && playerId < 4) {
-            if (rooms[roomId].taken[playerId] && rooms[roomId].taken[playerId] !== socket.id) {
-                socket.emit('joinError', '抱歉！這個角色已經被其他人選走囉！請換一個角色登入。');
+            const existingSocketId = rooms[roomId].taken[playerId];
+            const isStillConnected = io.sockets.sockets.get(existingSocketId);
+
+            // Allow takeover if:
+            // 1. Slot is empty (null)
+            // 2. Existing socket is the SAME as current (re-joined)
+            // 3. Existing socket is DEAD / Disconnected
+            if (existingSocketId && existingSocketId !== socket.id && isStillConnected) {
+                socket.emit('joinError', '抱歉！這個角色目前正忙或已被選走囉！請檢查連線或換個角色。');
                 return;
             }
         }
 
         socket.join(roomId);
-        rooms[roomId].taken[playerId] = socket.id;
+        rooms[roomId].taken[playerId] = socket.id; // Refresh ownership to current socket
         socket.roomId = roomId;
         socket.playerId = playerId;
 
