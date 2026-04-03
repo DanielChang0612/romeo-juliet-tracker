@@ -40,6 +40,12 @@ playerBtns.forEach(btn => {
 
 document.getElementById('random-room-btn').addEventListener('click', () => {
     roomInput.value = Math.random().toString(36).substring(2, 6).toUpperCase();
+    socket.emit('watchRoom', roomInput.value);
+});
+
+roomInput.addEventListener('input', () => {
+    const rid = roomInput.value.trim().toUpperCase();
+    if (rid) socket.emit('watchRoom', rid);
 });
 
 function updateStatusUI(online) {
@@ -56,18 +62,38 @@ function updateStatusUI(online) {
 socket.on('connect', () => {
     updateStatusUI(true);
     
-    // 🔥 AUTO RE-JOIN Logic
+    // 🔥 Session Persistence Logic
     const savedRoom = localStorage.getItem('rj_last_room');
     const savedId = localStorage.getItem('rj_last_id');
     const savedName = localStorage.getItem('rj_last_name');
 
-    if (savedRoom && savedId !== null) {
-        console.log('嘗試自動恢復房間:', savedRoom);
+    // 1. If we have saved data, pre-fill the UI regardless
+    if (savedRoom) roomInput.value = savedRoom;
+    if (savedName) document.getElementById('my-name-input').value = savedName;
+    if (savedId !== null) {
+        myPlayerId = parseInt(savedId);
+        playerBtns.forEach(btn => {
+            if (btn.getAttribute('data-id') === savedId) {
+                btn.classList.add('selected');
+            } else {
+                btn.classList.remove('selected');
+            }
+        });
+    }
+
+    // 2. AUTO RE-JOIN ONLY if this is a reconnection (already joined once)
+    // If it's the very first load (isInitialJoined is false), we let the user see the login screen
+    if (isInitialJoined && savedRoom && savedId !== null) {
+        console.log('連線恢復：自動重連房間', savedRoom);
         socket.emit('joinRoom', { 
             roomId: savedRoom, 
             playerId: parseInt(savedId), 
             playerName: savedName || "" 
         });
+    } else {
+        // Initial load: Sync lobby for the current room input
+        const initialRid = roomInput.value.trim().toUpperCase();
+        if (initialRid) socket.emit('watchRoom', initialRid);
     }
 });
 
@@ -87,6 +113,11 @@ joinBtn.addEventListener('click', () => {
     }
 
     const customName = document.getElementById('my-name-input').value.trim();
+    if (!customName) {
+        alert('請輸入你的遊戲 ID！讓隊友知道你是誰～');
+        return;
+    }
+    
     myRoomId = roomId;
     myPlayerName = customName;
 
@@ -275,9 +306,11 @@ function updateMyPathDisplay() {
 
 // Socket listening
 socket.on('initialState', (data) => {
-    const { matrix, names } = data;
+    const { matrix, names, taken } = data;
     playerNames = names;
     globalMatrix = matrix;
+    
+    renderTeamHUD(taken, names);
 
     // Check if we need to switch from login to app screen
     if (!isInitialJoined) {
@@ -297,6 +330,7 @@ socket.on('initialState', (data) => {
 
 socket.on('namesUpdated', (names) => {
     playerNames = names;
+    socket.emit('requestTakenStatus');
     renderAccordionState();
     if (myPlayerId !== -1) displayIdentity.innerText = `我是角色: ${playerNames[myPlayerId]}`;
 });
@@ -314,6 +348,72 @@ socket.on('joinError', (msg) => {
     localStorage.removeItem('rj_last_room');
     window.location.reload();
 });
+
+socket.on('playersUpdated', (data) => {
+    const { taken, names } = data;
+    playerNames = names; // Store locally for display
+    
+    playerBtns.forEach((btn, idx) => {
+        const info = document.getElementById(`slot-info-${idx}`);
+        const charLabel = String.fromCharCode(65 + idx); // A, B, C, D
+        btn.innerText = `角色 ${charLabel}`;
+        
+        if (taken[idx]) {
+            // IF it's someone ELSE, lock it
+            if (myPlayerId !== idx) {
+                btn.classList.add('locked');
+                btn.disabled = true;
+                if (info) info.innerHTML = `<span style="color:var(--color-p${idx})">${names[idx]}</span> 已進入`;
+            } else {
+                // If it's ME (re-joining/fresh refresh)
+                btn.classList.remove('locked');
+                btn.disabled = false;
+                if (info) info.innerHTML = `<span style="color:var(--color-p${idx})">是你本人 🙋</span>`;
+            }
+        } else {
+            // NO ONE here
+            btn.classList.remove('locked');
+            btn.disabled = false;
+            // Only remove 'taken' if it wasn't the previously 'selected' one in UI?
+            // Actually, we just need simple unlocked state
+            if (info) info.innerText = "候選中...";
+        }
+    });
+
+    renderTeamHUD(taken, names);
+});
+
+// Toggle Detailed Team List
+document.getElementById('toggle-members-btn').addEventListener('click', () => {
+    const hud = document.getElementById('team-hud');
+    hud.classList.toggle('hidden');
+});
+
+function renderTeamHUD(taken, names) {
+    const hud = document.getElementById('team-hud');
+    if (!hud) return;
+    hud.innerHTML = '';
+    
+    for (let i = 0; i < 4; i++) {
+        const slot = document.createElement('div');
+        const isOnline = taken[i];
+        const isMe = (i === myPlayerId);
+        
+        // Update Mini Status Grid (the dots under Identity)
+        const miniDot = document.getElementById(`mini-dot-${i}`);
+        if (miniDot) {
+            if (isOnline) miniDot.classList.add('active');
+            else miniDot.classList.remove('active');
+        }
+
+        slot.className = `team-member p${i} ${isOnline ? 'online' : 'offline'} ${isMe ? 'is-me' : ''}`;
+        slot.innerHTML = `
+            <div class="member-dot"></div>
+            <div class="member-name">${names[i]} ${isMe ? '(你)' : ''}</div>
+        `;
+        hud.appendChild(slot);
+    }
+}
 
 socket.on('roomReset', (matrix) => {
     globalMatrix = matrix;

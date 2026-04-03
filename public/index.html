@@ -32,14 +32,26 @@
         <div class="input-group">
             <label>選擇你的身份角色</label>
             <div class="player-select">
-                <button class="player-btn p0" data-id="0">玩家 A</button>
-                <button class="player-btn p1" data-id="1">玩家 B</button>
-                <button class="player-btn p2" data-id="2">玩家 C</button>
-                <button class="player-btn p3" data-id="3">玩家 D</button>
+                <div class="player-slot">
+                    <button class="player-btn p0" data-id="0">角色 A</button>
+                    <div class="slot-info" id="slot-info-0">檢測狀態中...</div>
+                </div>
+                <div class="player-slot">
+                    <button class="player-btn p1" data-id="1">角色 B</button>
+                    <div class="slot-info" id="slot-info-1">檢測狀態中...</div>
+                </div>
+                <div class="player-slot">
+                    <button class="player-btn p2" data-id="2">角色 C</button>
+                    <div class="slot-info" id="slot-info-2">檢測狀態中...</div>
+                </div>
+                <div class="player-slot">
+                    <button class="player-btn p3" data-id="3">角色 D</button>
+                    <div class="slot-info" id="slot-info-3">檢測狀態中...</div>
+                </div>
             </div>
         </div>
         <div class="input-group">
-            <label>輸入你的遊戲 ID (選填)</label>
+            <label>輸入你的遊戲 ID (必填)</label>
             <input type="text" id="my-name-input" placeholder="例如: 雙刀流" maxlength="10">
         </div>
         <button id="join-btn" class="primary-btn">進入實時戰場</button>
@@ -51,13 +63,26 @@
             <div class="room-info">
                 <h2>房間: <span id="display-room">---</span></h2>
                 <div class="my-identity" id="display-identity">我是角色: ---</div>
+                
+                <!-- 🔥 Mini Status Grid 🔥 -->
+                <div class="mini-status-grid">
+                    <div class="status-dot p0" id="mini-dot-0"></div>
+                    <div class="status-dot p1" id="mini-dot-1"></div>
+                    <div class="status-dot p2" id="mini-dot-2"></div>
+                    <div class="status-dot p3" id="mini-dot-3"></div>
+                </div>
+
                 <div id="app-status" style="font-size: 0.7rem; color: var(--text-muted); font-weight: 800;"></div>
             </div>
             <div class="header-right">
+                <button id="toggle-members-btn" class="secondary-btn-small">👥 成員列表</button>
                 <div class="guild-badge-small">🛡️ PiKaPi</div>
                 <button id="reset-btn" class="danger-btn">全局重置</button>
             </div>
         </header>
+        
+        <!-- 🔥 Team HUD (Pop-out/Hidden by default) 🔥 -->
+        <div class="team-hud hidden" id="team-hud"></div>
 
         <!-- My Path Tracker -->
         <div class="my-path-card" style="margin-bottom: 20px;">
