@@ -13,6 +13,7 @@ const joinBtn = document.getElementById('join-btn');
 const displayRoom = document.getElementById('display-room');
 const displayIdentity = document.getElementById('display-identity');
 const resetBtn = document.getElementById('reset-btn');
+const backToLobbyBtn = document.getElementById('back-to-lobby-btn');
 const connectionStatus = document.getElementById('connection-status');
 const appStatus = document.getElementById('app-status');
 
@@ -29,14 +30,29 @@ let globalMatrix = [];
 let activeAccordionFloor = 0; 
 let isInitialJoined = false;
 
+function checkJoinButtonState() {
+    const customName = document.getElementById('my-name-input').value.trim();
+    if (myPlayerId !== -1 && customName.length > 0) {
+        joinBtn.disabled = false;
+    } else {
+        joinBtn.disabled = true;
+    }
+}
+
 // 🔥 Session Recovery Login logic
 playerBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
+        // Prevent clicking locked buttons
+        if (e.target.classList.contains('locked')) return;
+
         playerBtns.forEach(b => b.classList.remove('selected'));
         e.target.classList.add('selected');
         myPlayerId = parseInt(e.target.getAttribute('data-id'));
+        checkJoinButtonState();
     });
 });
+
+document.getElementById('my-name-input').addEventListener('input', checkJoinButtonState);
 
 document.getElementById('random-room-btn').addEventListener('click', () => {
     roomInput.value = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -70,16 +86,18 @@ socket.on('connect', () => {
     // 1. If we have saved data, pre-fill the UI regardless
     if (savedRoom) roomInput.value = savedRoom;
     if (savedName) document.getElementById('my-name-input').value = savedName;
-    if (savedId !== null) {
+    
+    // We only restore myPlayerId for session recovery if we are already inside the game (isInitialJoined is true)
+    // For a fresh load (lobby screen), we want the user to select their role manually.
+    if (isInitialJoined && savedId !== null) {
         myPlayerId = parseInt(savedId);
-        playerBtns.forEach(btn => {
-            if (btn.getAttribute('data-id') === savedId) {
-                btn.classList.add('selected');
-            } else {
-                btn.classList.remove('selected');
-            }
-        });
+    } else {
+        myPlayerId = -1;
+        playerBtns.forEach(btn => btn.classList.remove('selected'));
     }
+
+    // Initialize the Join Button state
+    checkJoinButtonState();
 
     // 2. AUTO RE-JOIN ONLY if this is a reconnection (already joined once)
     // If it's the very first load (isInitialJoined is false), we let the user see the login screen
@@ -156,6 +174,17 @@ resetBtn.addEventListener('click', () => {
     }
 });
 
+if (backToLobbyBtn) {
+    backToLobbyBtn.addEventListener('click', () => {
+        if (confirm('確定要退回大廳選單嗎？這將會釋放您當前的角色位置。')) {
+            // Clear last room and ID to prevent auto-reconnection
+            localStorage.removeItem('rj_last_room');
+            localStorage.removeItem('rj_last_id');
+            window.location.reload();
+        }
+    });
+}
+
 // ========= Accordion Logic =========
 
 function initAccordionUI() {
@@ -178,10 +207,38 @@ function initAccordionUI() {
             <div class="row-body">
                 <div class="action-buttons-wrapper">
                     <div class="action-buttons">
-                        <button class="plat-btn my-plat-btn border-p${myPlayerId}" data-plat="0" onclick="handlePlatformClick(${f}, 0)">1</button>
-                        <button class="plat-btn my-plat-btn border-p${myPlayerId}" data-plat="1" onclick="handlePlatformClick(${f}, 1)">2</button>
-                        <button class="plat-btn my-plat-btn border-p${myPlayerId}" data-plat="2" onclick="handlePlatformClick(${f}, 2)">3</button>
-                        <button class="plat-btn my-plat-btn border-p${myPlayerId}" data-plat="3" onclick="handlePlatformClick(${f}, 3)">4</button>
+                        <button class="plat-btn my-plat-btn border-p${myPlayerId}" data-plat="0" 
+                            onmousedown="handlePlatformStart(event, ${f}, 0)" 
+                            onmouseup="handlePlatformEnd(event, ${f}, 0)"
+                            onmouseleave="handlePlatformCancel(event)"
+                            ontouchstart="handlePlatformStart(event, ${f}, 0)" 
+                            ontouchend="handlePlatformEnd(event, ${f}, 0)"
+                            ontouchcancel="handlePlatformCancel(event)"
+                            onclick="handlePlatformClick(${f}, 0)">1</button>
+                        <button class="plat-btn my-plat-btn border-p${myPlayerId}" data-plat="1" 
+                            onmousedown="handlePlatformStart(event, ${f}, 1)" 
+                            onmouseup="handlePlatformEnd(event, ${f}, 1)"
+                            onmouseleave="handlePlatformCancel(event)"
+                            ontouchstart="handlePlatformStart(event, ${f}, 1)" 
+                            ontouchend="handlePlatformEnd(event, ${f}, 1)"
+                            ontouchcancel="handlePlatformCancel(event)"
+                            onclick="handlePlatformClick(${f}, 1)">2</button>
+                        <button class="plat-btn my-plat-btn border-p${myPlayerId}" data-plat="2" 
+                            onmousedown="handlePlatformStart(event, ${f}, 2)" 
+                            onmouseup="handlePlatformEnd(event, ${f}, 2)"
+                            onmouseleave="handlePlatformCancel(event)"
+                            ontouchstart="handlePlatformStart(event, ${f}, 2)" 
+                            ontouchend="handlePlatformEnd(event, ${f}, 2)"
+                            ontouchcancel="handlePlatformCancel(event)"
+                            onclick="handlePlatformClick(${f}, 2)">3</button>
+                        <button class="plat-btn my-plat-btn border-p${myPlayerId}" data-plat="3" 
+                            onmousedown="handlePlatformStart(event, ${f}, 3)" 
+                            onmouseup="handlePlatformEnd(event, ${f}, 3)"
+                            onmouseleave="handlePlatformCancel(event)"
+                            ontouchstart="handlePlatformStart(event, ${f}, 3)" 
+                            ontouchend="handlePlatformEnd(event, ${f}, 3)"
+                            ontouchcancel="handlePlatformCancel(event)"
+                            onclick="handlePlatformClick(${f}, 3)">4</button>
                     </div>
                 </div>
             </div>
@@ -210,6 +267,50 @@ function toggleRow(floor) {
     }
 }
 
+// ========= Option B Long Press & Click Logic =========
+let longPressTimer = null;
+let isLongPressActive = false;
+
+function handlePlatformStart(e, floor, platform) {
+    if (e.type === 'mousedown' && e.button !== 0) return;
+    
+    isLongPressActive = false;
+    clearTimeout(longPressTimer);
+    
+    longPressTimer = setTimeout(() => {
+        isLongPressActive = true;
+        handlePlatformLongPress(floor, platform);
+        if (navigator.vibrate) navigator.vibrate(50);
+    }, 600); // 0.6 seconds long press
+}
+
+function handlePlatformEnd(e, floor, platform) {
+    clearTimeout(longPressTimer);
+    if (isLongPressActive) {
+        e.preventDefault();
+        isLongPressActive = false;
+    }
+}
+
+function handlePlatformCancel(e) {
+    clearTimeout(longPressTimer);
+}
+
+function handlePlatformLongPress(floor, platform) {
+    if (!globalMatrix || globalMatrix.length === 0 || myPlayerId === -1) return;
+
+    const val = globalMatrix[floor][myPlayerId][platform];
+    let newValue = -1; // Default to Wrong (❌)
+    
+    if (val === -1) {
+        newValue = 0; // If already wrong, clear to blank (0)
+    }
+
+    socket.emit('updateState', {
+        roomId: myRoomId, floor, player: myPlayerId, platform, value: newValue
+    });
+}
+
 function handlePlatformClick(floor, platform) {
     if (!globalMatrix || globalMatrix.length === 0 || myPlayerId === -1) return;
     
@@ -221,12 +322,10 @@ function handlePlatformClick(floor, platform) {
     }
 
     const val = globalMatrix[floor][myPlayerId][platform];
-    let newValue = 1; 
+    let newValue = 1; // Default to correct ✅
     
-    if (val === 1) newValue = -1; 
-    else if (val === -1) {
-        if (existingCorrectPlatform !== -1) newValue = 1; 
-        else newValue = 0; 
+    if (val === 1) {
+        newValue = 0; // If already correct, clear to blank (0)
     }
 
     if (newValue === 1 && existingCorrectPlatform !== -1 && existingCorrectPlatform !== platform) {
@@ -359,26 +458,33 @@ socket.on('playersUpdated', (data) => {
         btn.innerText = `角色 ${charLabel}`;
         
         if (taken[idx]) {
-            // IF it's someone ELSE, lock it
-            if (myPlayerId !== idx) {
-                btn.classList.add('locked');
-                btn.disabled = true;
-                if (info) info.innerHTML = `<span style="color:var(--color-p${idx})">${names[idx]}</span> 已進入`;
-            } else {
-                // If it's ME (re-joining/fresh refresh)
+            // IF we have already successfully joined the room, and it's our slot
+            if (isInitialJoined && myPlayerId === idx) {
                 btn.classList.remove('locked');
                 btn.disabled = false;
                 if (info) info.innerHTML = `<span style="color:var(--color-p${idx})">是你本人 🙋</span>`;
+            } else {
+                // Otherwise, someone else is occupying it on the server
+                btn.classList.add('locked');
+                btn.disabled = true;
+                if (info) info.innerHTML = `<span style="color:var(--color-p${idx})">${names[idx]}</span> 已進入`;
+                
+                // If this slot was pre-selected in the lobby, deselect it
+                if (!isInitialJoined && myPlayerId === idx) {
+                    btn.classList.remove('selected');
+                    myPlayerId = -1;
+                }
             }
         } else {
             // NO ONE here
             btn.classList.remove('locked');
             btn.disabled = false;
-            // Only remove 'taken' if it wasn't the previously 'selected' one in UI?
-            // Actually, we just need simple unlocked state
             if (info) info.innerText = "候選中...";
         }
     });
+
+    // Update the Join Button state in case the currently selected role was deselected
+    checkJoinButtonState();
 
     renderTeamHUD(taken, names);
 });

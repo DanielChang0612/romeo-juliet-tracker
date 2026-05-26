@@ -15,7 +15,7 @@
     <!-- Login / Lobby Screen -->
     <div id="login-screen" class="glass-panel active">
         <h1>Romeo & Juliet<br><span>PQ Tracker</span></h1>
-        <div class="guild-badge">✨ PiKaPi 公會專屬製作 ✨</div>
+        <div class="guild-badge">✨ PiKaPi 公會專屬製作 ✨ <span class="badge-version" style="font-size:0.75rem; background:rgba(253,186,116,0.15); padding:2px 6px; border-radius:6px; margin-left:5px; border:1px solid rgba(253,186,116,0.3);">v3.0</span></div>
         
         <!-- 🔥 New Status Bar 🔥 -->
         <div id="connection-status" style="text-align: center; font-size: 0.8rem; margin-top: -15px; margin-bottom: 20px; color: var(--text-muted);">
@@ -54,7 +54,7 @@
             <label>輸入你的遊戲 ID (必填)</label>
             <input type="text" id="my-name-input" placeholder="例如: 雙刀流" maxlength="10">
         </div>
-        <button id="join-btn" class="primary-btn">進入實時戰場</button>
+        <button id="join-btn" class="primary-btn" disabled>進入實時戰場</button>
     </div>
 
     <!-- Main App Screen -->
@@ -75,8 +75,9 @@
                 <div id="app-status" style="font-size: 0.7rem; color: var(--text-muted); font-weight: 800;"></div>
             </div>
             <div class="header-right">
+                <button id="back-to-lobby-btn" class="secondary-btn-small">🏠 返回首頁</button>
                 <button id="toggle-members-btn" class="secondary-btn-small">👥 成員列表</button>
-                <div class="guild-badge-small">🛡️ PiKaPi</div>
+                <div class="guild-badge-small">🛡️ PiKaPi <span style="opacity:0.6; font-size:0.7rem; margin-left:3px; font-weight:normal;">v3.0</span></div>
                 <button id="reset-btn" class="danger-btn">全局重置</button>
             </div>
         </header>
